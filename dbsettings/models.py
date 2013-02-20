@@ -8,7 +8,7 @@ class SettingManager(models.Manager):
         return all.filter(site=Site.objects.get_current())
 
     def get_all_sites(self, group_obj, attribute_name):
-        return _get_all_sites(self, group_obj.__module__, attribute_name)
+        return self._get_all_sites(self, group_obj.__module__, attribute_name)
         # return _get_from_all_sites(self, type(group_obj), attribute_name)
 
     def _get_all_sites(self, module_name, attribute_name):
