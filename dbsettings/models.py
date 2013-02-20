@@ -13,6 +13,17 @@ class SettingManager(models.Manager):
         return self._get_all_sites(group_obj.__module__, attribute_name)
         # return _get_from_all_sites(self, type(group_obj), attribute_name)
 
+    def get_all_sites_multiple(self, group_obj, *attributes):
+        results = super(SettingManager, self).get_query_set().filter(
+            module_name__exact=module_name,
+        ).extra(
+            where=attribute_name in attributes
+        ).values('site_id', 'attribute_name', 'value')
+
+        import pdb; pdb.set_trace()
+
+        return results
+
     def _get_all_sites(self, module_name, attribute_name):
         results = super(SettingManager, self).get_query_set().filter(
             module_name__exact=module_name,
