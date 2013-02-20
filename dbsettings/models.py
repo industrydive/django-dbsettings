@@ -13,16 +13,16 @@ class SettingManager(models.Manager):
         return self._get_all_sites(group_obj.__module__, attribute_name)
         # return _get_from_all_sites(self, type(group_obj), attribute_name)
 
-    def get_all_sites_multiple(self, group_obj, *attributes):
-        where_str = 'attribute_name in %s' % attributes
-        print where_str
-        results = super(SettingManager, self).get_query_set().filter(
-            module_name__exact=group_obj.__module__,
-        ).extra(
-            where=[where_str]
-        ).values('site_id', 'attribute_name', 'value')
+    # def get_all_sites_multiple(self, group_obj, *attributes):
+    #     where_str = 'attribute_name in %s' % attributes
+    #     print where_str
+    #     results = super(SettingManager, self).get_query_set().filter(
+    #         module_name__exact=group_obj.__module__,
+    #     ).extra(
+    #         where=[where_str]
+    #     ).values('site_id', 'attribute_name', 'value')
 
-        return results
+    #     return results
 
     def _get_all_sites(self, module_name, attribute_name):
         results = super(SettingManager, self).get_query_set().filter(
