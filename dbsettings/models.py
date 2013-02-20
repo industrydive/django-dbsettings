@@ -16,6 +16,7 @@ class Setting(models.Model):
     value = models.CharField(max_length=255, blank=True)
 
     objects = SettingManager()
+    all_sites = models.Manager()
 
     def __nonzero__(self):
         return self.pk is not None
