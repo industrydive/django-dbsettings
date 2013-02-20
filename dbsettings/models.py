@@ -47,6 +47,11 @@ class Setting(models.Model):
     objects = SettingManager()
     all_sites = models.Manager()
 
+
+    class Meta:
+        unique_together = ('site', 'module_name', 'class_name', 'attribute_name')
+
+
     def __nonzero__(self):
         return self.pk is not None
 
