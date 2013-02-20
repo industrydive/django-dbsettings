@@ -15,7 +15,7 @@ class SettingManager(models.Manager):
 
     def get_all_sites_multiple(self, group_obj, *attributes):
         results = super(SettingManager, self).get_query_set().filter(
-            module_name__exact=module_name,
+            module_name__exact=group_obj.__module__,
         ).extra(
             where=attribute_name in attributes
         ).values('site_id', 'attribute_name', 'value')
