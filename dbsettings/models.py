@@ -17,10 +17,8 @@ class SettingManager(models.Manager):
         results = super(SettingManager, self).get_query_set().filter(
             module_name__exact=group_obj.__module__,
         ).extra(
-            where=attribute_name in attributes
+            where=[attribute_name in attributes]
         ).values('site_id', 'attribute_name', 'value')
-
-        import pdb; pdb.set_trace()
 
         return results
 
