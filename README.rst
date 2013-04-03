@@ -25,6 +25,13 @@ code in your application that uses the setting will receive the updated value.
 Installation
 ============
 
+A Note on upgrading
+-----
+For now, when coming to this branch from the official branch, a south migration is recommended as follows:
+manage.py migrate dbsettings 0001 --fake
+manage.py migrate dbsettings
+
+
 To install the ``dbsettings`` package, simply place it anywhere on your
 ``PYTHONPATH``.
 
