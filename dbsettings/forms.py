@@ -12,7 +12,7 @@ RE_FIELD_NAME = re.compile(r'^(.+)__(.*)__(.+)$')
 
 
 class SettingsEditor(forms.BaseForm):
-    """Base editor, from which customized forms are created"""
+    "Base editor, from which customized forms are created"
 
     def __iter__(self):
         for field in super(SettingsEditor, self).__iter__():
@@ -23,7 +23,7 @@ class SettingsEditor(forms.BaseForm):
         return self.specialize(field)
 
     def specialize(self, field):
-        """Wrapper to add module_name and class_name for regrouping"""
+        "Wrapper to add module_name and class_name for regrouping"
         field.label = capfirst(field.label)
         module_name, class_name, _ = RE_FIELD_NAME.match(field.name).groups()
 
@@ -41,7 +41,7 @@ class SettingsEditor(forms.BaseForm):
 
 
 def customized_editor(user, settings):
-    """Customize the setting editor based on the current user and setting list"""
+    "Customize the setting editor based on the current user and setting list"
     base_fields = SortedDict()
     verbose_names = {}
     for setting in settings:

@@ -79,15 +79,15 @@ class Value(object):
     # Subclasses should override the following methods where applicable
 
     def to_python(self, value):
-        """Returns a native Python object suitable for immediate use"""
+        "Returns a native Python object suitable for immediate use"
         return value
 
     def get_db_prep_save(self, value):
-        """Returns a value suitable for storage into a CharField"""
+        "Returns a value suitable for storage into a CharField"
         return unicode(value)
 
     def to_editor(self, value):
-        """Returns a value suitable for display in a form widget"""
+        "Returns a value suitable for display in a form widget"
         return unicode(value)
 
 ###############
