@@ -26,6 +26,6 @@ class Setting(models.Model):
         return self.pk is not None
 
     def save(self, *args, **kwargs):
-        if not self.site:
+        if not self.site_id:
             self.site = Site.objects.get_current()
         return super(Setting, self).save(*args, **kwargs)
