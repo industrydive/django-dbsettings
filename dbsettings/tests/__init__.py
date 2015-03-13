@@ -68,6 +68,12 @@ class ClashSettings1_2(dbsettings.Group):
 
 module_clash1 = ClashSettings1()
 
+class GlobalSettings(dbsettings.Group):
+    gs_boolean = dbsettings.BooleanValue(default=True)
+    gs_string = dbsettings.StringValue(default="default")
+
+site_settings = GlobalSettings()
+
 class ModelClash(models.Model):
     settings = ClashSettings1_2()
 
@@ -81,12 +87,22 @@ class SettingsTestCase(test.TestCase):
     def setUpClass(cls):
         # Since some text assertions are performed, make sure that no translation interrupts.
         activate('en')
+        from django.contrib.sites.models import Site
+        from django.conf import settings
+        Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
+        Site(id=settings.SITE_ID + 1, domain="example2.com", name="example2.com").save()
+
+        other_site_settings = GlobalSettings()
+        import pdb; pdb.set_trace()
+        other_site_settings.site_id = settings.SITE_ID + 1
+        other_site_settings.save()
 
     @classmethod
     def tearDownClass(cls):
         deactivate()
 
     def setUp(self):
+
         # Standard test fixtures don't update the in-memory cache.
         # So we have to do it ourselves this time.
         loading.set_setting_value('dbsettings.tests', 'Populated', 'boolean', True)
@@ -114,6 +130,10 @@ class SettingsTestCase(test.TestCase):
         loading.set_setting_value('dbsettings.tests', 'Combined', 'time', '14:17:15')
         loading.set_setting_value('dbsettings.tests', 'Combined', 'datetime', '2010-04-26 14:17:15')
         loading.set_setting_value('dbsettings.tests', 'Combined', 'enabled', True)
+
+
+        # less standard
+        loading.set_setting_value('dbsettings.tests', '' )
 
     def test_settings(self):
         "Make sure settings groups are initialized properly"
