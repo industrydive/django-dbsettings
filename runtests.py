@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from django import VERSION as DJANGO_VERSION
+import django
 from django.conf import settings
 from django.core.management import call_command
 
@@ -19,22 +19,23 @@ SETTINGS = {
     'INSTALLED_APPS': INSTALLED_APPS,
     'SITE_ID': 1,
     'ROOT_URLCONF': 'dbsettings.tests.test_urls',
-}
-
-if DJANGO_VERSION > (1, 2):
-    # Post multi-db settings.
-    SETTINGS['DATABASES'] = {
+    'DATABASES': {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': ':memory:',
         }
-    }
-else:
-    # Pre multi-db settings.
-    SETTINGS['DATABASE_ENGINE'] = 'sqlite3'
-    SETTINGS['DATABASE_NAME'] = ':memory:'
+    },
+    'MIDDLEWARE_CLASSES': (
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+    )
+}
 
 if not settings.configured:
     settings.configure(**SETTINGS)
+
+if django.VERSION >= (1, 7):
+        django.setup()
 
 call_command('test', 'dbsettings')

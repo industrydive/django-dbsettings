@@ -1,3 +1,5 @@
+|
+
 ================================
 Storing settings in the database
 ================================
@@ -21,6 +23,27 @@ The main goal in using this application is to define a set of placeholders that
 will be used to represent the settings that are stored in the database. Then,
 the settings may edited at run-time using the provided editor, and all Python
 code in your application that uses the setting will receive the updated value.
+
+Requirements
+============
+
++------------------+------------+--------------+
+| Dbsettings       | Python     | Django       |
++==================+============+==============+
+| >=0.7            | 3.2        | 1.5 - 1.7    |
+|                  +------------+--------------+
+|                  | 2.7        | 1.3 - 1.7    |
+|                  +------------+--------------+
+|                  | 2.6        | 1.3 - 1.6    |
++------------------+------------+--------------+
+| ==0.6            | 3.2        |       1.5    |
+|                  +------------+--------------+
+|                  | 2.6 - 2.7  | 1.3 - 1.5    |
++------------------+------------+--------------+
+| <=0.5            | 2.6 - 2.7  | 1.2\* - 1.4  |
++------------------+------------+--------------+
+
+\* Possibly version below 1.2 will work too, but not tested.
 
 Installation
 ============
@@ -124,7 +147,7 @@ lower-case, as it will be capitalized as necessary, automatically.
     class EmailOptions(dbsettings.Group):
         enabled = dbsettings.BooleanValue('whether to send emails or not')
         sender = dbsettings.StringValue('address to send emails from')
-        subject = dbsettings.StringValue()
+        subject = dbsettings.StringValue(default='SiteMail')
 
 For more descriptive explanation, the ``help_text`` argument can be used. It
 will be shown in the editor.
@@ -231,6 +254,7 @@ the ``ImageLimits`` were already defined.
     False
     >>> models.email.sender
     >>> models.email.subject
+    'SiteMail'  # Since default was defined
 
     # ImageLimits are defined
     >>> models.Image.limits.maximum_width
@@ -360,6 +384,24 @@ User input will be parsed according to ``TIME_INPUT_FORMATS`` setting.
 
 See ``DateTimeValue`` for the remark about assigning.
 
+ImageValue
+----------
+
+(requires PIL or Pillow imaging library to work)
+
+Allows to upload image and view its preview.
+
+ImageValue has optional ``upload_to`` keyword, which specify path
+(relative to ``MEDIA_ROOT``), where uploaded images will be stored.
+If keyword is not present, files will be saved directly under
+``MEDIA_ROOT``.
+
+PasswordValue
+-------------
+
+Presents a standard password input. Retain old setting value if not changed.
+
+
 Setting defaults for a distributed application
 ==============================================
 
@@ -401,6 +443,13 @@ some of the settings provided earlier in this document::
 Changelog
 =========
 
+**0.7**
+    - Added PasswordValue
+    - Added compatibility with Django 1.6 and 1.7.
+**0.6**
+    - Added compatibility with Django 1.5 and python3, dropped support for Django 1.2.
+    - Fixed permissions: added permission for editing non-model (module-level) settings
+    - Make PIL/Pillow not required in setup.py
 **0.5** (11/10/2012)
     - Fixed error occuring when test are run with ``LANGUAGE_CODE`` different than 'en'
     - Added verbose_name option for Groups

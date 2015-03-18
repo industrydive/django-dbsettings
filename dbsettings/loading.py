@@ -1,6 +1,4 @@
-from bisect import bisect
-
-from django.utils.datastructures import SortedDict
+from collections import OrderedDict
 from django.core.cache import cache
 
 from dbsettings.models import Setting
@@ -9,13 +7,7 @@ __all__ = ['get_all_settings', 'get_setting', 'get_setting_storage',
            'register_setting', 'unregister_setting', 'set_setting_value']
 
 
-class SettingDict(SortedDict):
-    "Sorted dict that has a bit more list-type functionality"
-
-    def __iter__(self):
-        return self.itervalues()
-
-_settings = SettingDict()
+_settings = OrderedDict()
 
 
 def _get_cache_key(module_name, class_name, attribute_name):
@@ -23,15 +15,23 @@ def _get_cache_key(module_name, class_name, attribute_name):
 
 
 def get_all_settings():
-    return list(_settings)
+    return list(_settings.values())
 
 
 def get_app_settings(app_label):
-    return [p for p in _settings if app_label == p.module_name.split('.')[-2]]
+    return [p for p in _settings if app_label == p.app]
 
 
 def get_setting(module_name, class_name, attribute_name):
     return _settings[module_name, class_name, attribute_name]
+
+
+def setting_in_db(module_name, class_name, attribute_name):
+    return Setting.objects.filter(
+        module_name=module_name,
+        class_name=class_name,
+        attribute_name=attribute_name,
+    ).count() == 1
 
 
 def get_setting_storage(module_name, class_name, attribute_name):
@@ -58,8 +58,7 @@ def get_setting_storage(module_name, class_name, attribute_name):
 
 def register_setting(setting):
     if setting.key not in _settings:
-        _settings.update({setting.key: setting})
-        # _settings.insert(bisect(list(_settings), setting), setting.key, setting)
+        _settings[setting.key] = setting
 
 
 def unregister_setting(setting):

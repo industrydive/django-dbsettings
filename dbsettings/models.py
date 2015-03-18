@@ -4,8 +4,10 @@ from django.contrib.sites.models import Site
 
 class SettingManager(models.Manager):
     def get_queryset(self):
-        all = super(SettingManager, self).get_queryset()
-        return all.filter(site=Site.objects.get_current())
+        sup = super(SettingManager, self)
+        qs = sup.get_queryset() if hasattr(sup, 'get_queryset') else sup.get_query_set()
+        return qs.filter(site=Site.objects.get_current())
+    get_query_set = get_queryset
 
 class Setting(models.Model):
     site = models.ForeignKey(Site)
@@ -22,7 +24,7 @@ class Setting(models.Model):
         unique_together = ('site', 'module_name', 'class_name', 'attribute_name')
 
 
-    def __nonzero__(self):
+    def __bool__(self):
         return self.pk is not None
 
     def save(self, *args, **kwargs):

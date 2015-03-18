@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 # Dynamically calculate the version based on dbsettings.VERSION
-version_tuple = (0, 5, None)
+version_tuple = (0, 7, 1)
 if version_tuple[2] is not None:
     if type(version_tuple[2]) == int:
         version = "%d.%d.%s" % version_tuple
@@ -25,6 +25,7 @@ setup(
     license='BSD',
     install_requires=(
         'Pillow',
+        'six',
     ),
     classifiers=[
         'Development Status :: 4 - Beta',
