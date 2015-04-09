@@ -1,4 +1,4 @@
-from django.db.models.signals import post_syncdb
+from django.db.models.signals import post_migrate
 
 
 def mk_permissions(permissions, appname, verbosity):
@@ -25,14 +25,14 @@ def mk_permissions(permissions, appname, verbosity):
 
 def handler(sender, **kwargs):
     from dbsettings.loading import get_app_settings
-    app_label = sender.__name__.split('.')[-2]
+    app_label = sender.label
     are_global_settings = any(not s.class_name for s in get_app_settings(app_label))
     if are_global_settings:
         permission = (
             'can_edit__settings',
             'Can edit %s non-model settings' % app_label,
         )
-        mk_permissions([permission], app_label, 0)
+        mk_permissions([permission], app_label, verbosity=kwargs.get('verbosity', 0))
 
 
-post_syncdb.connect(handler)
+post_migrate.connect(handler)
