@@ -47,7 +47,7 @@ def customized_editor(user, settings):
     apps = {}
     for setting in settings:
         perm = '%s.can_edit_%s_settings' % (
-            setting.app,
+            'dbsettings',
             setting.class_name.lower()
         )
         # dbsettings.change_setting permission overrides any/all dbsettings group-specific perms
