@@ -46,10 +46,7 @@ def customized_editor(user, settings):
     verbose_names = {}
     apps = {}
     for setting in settings:
-        perm = '%s.can_edit_%s_settings' % (
-            'dbsettings',
-            setting.class_name.lower()
-        )
+        perm = 'dbsettings.can_edit_%s_settings' % setting.app.lower()
         # dbsettings.change_setting permission overrides any/all dbsettings group-specific perms
         if user.has_perm(perm) or user.has_perm("dbsettings.change_setting"):
             # Add the field to the customized field list
