@@ -23,6 +23,7 @@ class Setting(models.Model):
 
     class Meta:
         unique_together = ('site', 'module_name', 'class_name', 'attribute_name')
+        app_label = 'dbsettings'
 
 
     def __bool__(self):
