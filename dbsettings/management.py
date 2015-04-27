@@ -1,4 +1,4 @@
-from django.db.models.signals import post_syncdb
+from django.db.models.signals import post_migrate
 
 
 def mk_permissions(permissions, appname, verbosity):
@@ -10,8 +10,9 @@ def mk_permissions(permissions, appname, verbosity):
     from django.contrib.auth.models import Permission
     from django.contrib.contenttypes.models import ContentType
     # create a content type for the app
-    ct, created = ContentType.objects.get_or_create(model='', app_label=appname,
-                                                    defaults={'name': appname})
+    ct, created = ContentType.objects.get_or_create(model='setting', app_label='dbsettings',
+                                                    defaults={'name': 'dbsettings'})
+
     if created and verbosity >= 2:
         print("Adding custom content type '%s'" % ct)
     # create permissions
@@ -25,14 +26,14 @@ def mk_permissions(permissions, appname, verbosity):
 
 def handler(sender, **kwargs):
     from dbsettings.loading import get_app_settings
-    app_label = sender.__name__.split('.')[-2]
+    app_label = sender.label
     are_global_settings = any(not s.class_name for s in get_app_settings(app_label))
     if are_global_settings:
         permission = (
-            'can_edit__settings',
+            'can_edit_%s_settings' % app_label,
             'Can edit %s non-model settings' % app_label,
         )
-        mk_permissions([permission], app_label, 0)
+        mk_permissions([permission], app_label, verbosity=kwargs.get('verbosity', 0))
 
 
-post_syncdb.connect(handler)
+post_migrate.connect(handler)

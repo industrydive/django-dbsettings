@@ -51,11 +51,9 @@ def customized_editor(user, settings):
     verbose_names = {}
     apps = {}
     for setting in settings:
-        perm = '%s.can_edit_%s_settings' % (
-            setting.app,
-            setting.class_name.lower()
-        )
-        if user.has_perm(perm):
+        perm = 'dbsettings.can_edit_%s_settings' % setting.app.lower()
+        # dbsettings.change_setting permission overrides any/all dbsettings group-specific perms
+        if user.has_perm(perm) or user.has_perm("dbsettings.change_setting"):
             # Add the field to the customized field list
             storage = get_setting_storage(*setting.key)
             kwargs = {
@@ -64,6 +62,7 @@ def customized_editor(user, settings):
                 # Provide current setting values for initializing the form
                 'initial': setting.to_editor(storage.value),
                 'required': setting.required,
+                'widget': setting.widget,
             }
             if setting.choices:
                 field = forms.ChoiceField(choices=setting.choices, **kwargs)

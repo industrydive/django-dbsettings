@@ -29,11 +29,12 @@ class Value(object):
     creation_counter = 0
     unitialized_value = None
 
-    def __init__(self, description=None, help_text=None, choices=None, required=True, default=None):
+    def __init__(self, description=None, help_text=None, choices=None, required=True, default=None, widget=None):
         self.description = description
         self.help_text = help_text
         self.choices = choices or []
         self.required = required
+        self.widget = widget
         if default is None:
             self.default = self.unitialized_value
         else:
@@ -79,7 +80,8 @@ class Value(object):
 
     def __set__(self, instance, value):
         current_value = self.__get__(instance)
-        if self.to_python(value) != current_value:
+        python_value = value if value is None else self.to_python(value)
+        if python_value != current_value:
             set_setting_value(*(self.key + (value,)))
 
     # Subclasses should override the following methods where applicable
@@ -261,7 +263,7 @@ class MultiSeparatorValue(TextValue):
         if value:
             value = six.text_type(value)
             value = value.split(self.separator)
-            value = [x.strip() for x in value]
+            value = filter(None, (x.strip() for x in value))
         else:
             value = []
         return value
