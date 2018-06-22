@@ -25,11 +25,11 @@ class Setting(models.Model):
         all_sites = models.Manager()
 
     class Meta:
+        app_label = 'dbsettings'
         if USE_SITES:
             unique_together = ('site', 'module_name', 'class_name', 'attribute_name')
-    else:
-        unique_together = ('module_name', 'class_name', 'attribute_name')
-        app_label = 'dbsettings'
+        else:
+            unique_together = ('module_name', 'class_name', 'attribute_name')
 
 
     def save(self, *args, **kwargs):
