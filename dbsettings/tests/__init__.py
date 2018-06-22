@@ -1,5 +1,3 @@
-# For Django < 1.6 testrunner
-from .tests import *  # NOQA
 class GlobalSettings(dbsettings.Group):
     gs_boolean = dbsettings.BooleanValue(default=True)
     gs_string = dbsettings.StringValue(default="default")
