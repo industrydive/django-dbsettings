@@ -80,13 +80,11 @@ class Value(object):
 
     def __set__(self, instance, value):
         current_value = self.__get__(instance)
-        if self.to_python(value) != current_value:
+        python_value = value if value is None else self.to_python(value)
+        if python_value != current_value:
             set_setting_value(*(self.key + (value,)))
 
     # Subclasses should override the following methods where applicable
-
-    def meaningless(self, value):
-        return value is None or value == ""
 
     def to_python(self, value):
         "Returns a native Python object suitable for immediate use"
@@ -126,7 +124,7 @@ class DecimalValue(Value):
     field = forms.DecimalField
 
     def to_python(self, value):
-        return Decimal(value) if not self.meaningless(value) else None
+        return Decimal(value)
 
 
 # DurationValue has a lot of duplication and ugliness because of issue #2443
@@ -162,19 +160,20 @@ class FloatValue(Value):
     field = forms.FloatField
 
     def to_python(self, value):
-        return float(value) if not self.meaningless(value) else None
+        return float(value)
 
 
 class IntegerValue(Value):
     field = forms.IntegerField
 
     def to_python(self, value):
-        return int(value) if not self.meaningless(value) else None
+        return int(value)
 
 
 class PercentValue(Value):
 
     class field(forms.DecimalField):
+
         def __init__(self, *args, **kwargs):
             forms.DecimalField.__init__(self, 100, 0, 5, 2, *args, **kwargs)
 
@@ -183,10 +182,10 @@ class PercentValue(Value):
                 # Place a percent sign after a smaller text field
                 attrs = kwargs.pop('attrs', {})
                 attrs['size'] = attrs['max_length'] = 6
-                return mark_safe(forms.TextInput.render(self, attrs=attrs, *args, **kwargs) + ' %')
+                return forms.TextInput.render(self, attrs=attrs, *args, **kwargs) + '%'
 
     def to_python(self, value):
-        return Decimal(value) / 100 if not self.meaningless(value) else None
+        return Decimal(value) / 100
 
 
 class PositiveIntegerValue(IntegerValue):
@@ -264,7 +263,7 @@ class MultiSeparatorValue(TextValue):
         if value:
             value = six.text_type(value)
             value = value.split(self.separator)
-            value = [x.strip() for x in value]
+            value = filter(None, (x.strip() for x in value))
         else:
             value = []
         return value
@@ -307,7 +306,7 @@ class ImageValue(Value):
         if not value:
             return None
 
-        hashed_name = md5(six.text_type(time.time()).encode()).hexdigest() + value.name[-4:]
+        hashed_name = md5(six.text_type(time.time())).hexdigest() + value.name[-4:]
         image_path = pjoin(self._upload_to, hashed_name)
         dest_name = pjoin(settings.MEDIA_ROOT, image_path)
         directory = pjoin(settings.MEDIA_ROOT, self._upload_to)
