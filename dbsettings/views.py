@@ -1,6 +1,8 @@
+from __future__ import unicode_literals
+from django.utils import six
+
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
@@ -46,8 +48,9 @@ def app_settings(request, app_label, template='dbsettings/app_settings.html'):
                         location = setting.class_name
                     else:
                         location = setting.module_name
-                    update_msg = (_(u'Updated %(desc)s on %(location)s') %
-                                  {'desc': unicode(setting.description), 'location': location})
+                    update_msg = (_('Updated %(desc)s on %(location)s') %
+                                  {'desc': six.text_type(setting.description),
+                                   'location': location})
                     messages.add_message(request, messages.INFO, update_msg)
 
             return HttpResponseRedirect(request.path)
@@ -55,10 +58,10 @@ def app_settings(request, app_label, template='dbsettings/app_settings.html'):
         # Leave the form populated with current setting values
         form = editor()
 
-    return render_to_response(template, {
+    return render(request, template, {
         'title': title,
         'form': form,
-    }, context_instance=RequestContext(request))
+    })
 
 
 # Site-wide setting editor is identical, but without an app_label
