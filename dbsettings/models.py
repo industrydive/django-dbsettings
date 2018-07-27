@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.sites.models import Site
 
 from dbsettings.settings import USE_SITES, VALUE_LENGTH
 
@@ -22,9 +23,17 @@ class Setting(models.Model):
     if USE_SITES:
         site = models.ForeignKey(Site)
         objects = SiteSettingManager()
+        all_sites = models.Manager()
+
+
+    class Meta:
+        unique_together = ('site', 'module_name', 'class_name', 'attribute_name')
+        app_label = 'dbsettings'
+
 
         def save(self, *args, **kwargs):
-            self.site = Site.objects.get_current()
+            if not self.site_id:
+                self.site = Site.objects.get_current()
             return super(Setting, self).save(*args, **kwargs)
 
     def __bool__(self):
