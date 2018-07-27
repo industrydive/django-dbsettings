@@ -24,13 +24,18 @@ class Setting(models.Model):
         site = models.ForeignKey(Site)
         objects = SiteSettingManager()
         all_sites = models.Manager()
+    else:
+        objects = models.Manager()
 
 
     class Meta:
-        unique_together = ('site', 'module_name', 'class_name', 'attribute_name')
+        if USE_SITES:
+            unique_together = ('site', 'module_name', 'class_name', 'attribute_name')
+        else:
+            unique_together = ('module_name', 'class_name', 'attribute_name')
         app_label = 'dbsettings'
 
-
+    if USE_SITES:
         def save(self, *args, **kwargs):
             if not self.site_id:
                 self.site = Site.objects.get_current()
