@@ -1,21 +1,12 @@
-from bisect import bisect
-
-from django.utils.datastructures import SortedDict
+from collections import OrderedDict
 from django.core.cache import cache
 
-from dbsettings.models import Setting
 
 __all__ = ['get_all_settings', 'get_setting', 'get_setting_storage',
            'register_setting', 'unregister_setting', 'set_setting_value']
 
 
-class SettingDict(SortedDict):
-    "Sorted dict that has a bit more list-type functionality"
-
-    def __iter__(self):
-        return self.itervalues()
-
-_settings = SettingDict()
+_settings = OrderedDict()
 
 
 def _get_cache_key(module_name, class_name, attribute_name):
@@ -23,20 +14,33 @@ def _get_cache_key(module_name, class_name, attribute_name):
 
 
 def get_all_settings():
-    return list(_settings)
+    return list(_settings.values())
 
 
 def get_app_settings(app_label):
-    return [p for p in _settings if app_label == p.module_name.split('.')[-2]]
+    return [p for p in _settings.values() if app_label == p.app]
 
 
 def get_setting(module_name, class_name, attribute_name):
     return _settings[module_name, class_name, attribute_name]
 
 
+def setting_in_db(module_name, class_name, attribute_name):
+    from dbsettings.models import Setting
+    return Setting.objects.filter(
+        module_name=module_name,
+        class_name=class_name,
+        attribute_name=attribute_name,
+    ).count() == 1
+
+
 def get_setting_storage(module_name, class_name, attribute_name):
-    key = _get_cache_key(module_name, class_name, attribute_name)
-    storage = cache.get(key)
+    from dbsettings.models import Setting
+    from dbsettings.settings import USE_CACHE
+    storage = None
+    if USE_CACHE:
+        key = _get_cache_key(module_name, class_name, attribute_name)
+        storage = cache.get(key)
     if storage is None:
         try:
             storage = Setting.objects.get(
@@ -52,13 +56,14 @@ def get_setting_storage(module_name, class_name, attribute_name):
                 attribute_name=attribute_name,
                 value=setting_object.default,
             )
-        cache.set(key, storage)
+        if USE_CACHE:
+            cache.set(key, storage)
     return storage
 
 
 def register_setting(setting):
     if setting.key not in _settings:
-        _settings.insert(bisect(list(_settings), setting), setting.key, setting)
+        _settings[setting.key] = setting
 
 
 def unregister_setting(setting):
@@ -67,9 +72,11 @@ def unregister_setting(setting):
 
 
 def set_setting_value(module_name, class_name, attribute_name, value):
+    from dbsettings.settings import USE_CACHE
     setting = get_setting(module_name, class_name, attribute_name)
     storage = get_setting_storage(module_name, class_name, attribute_name)
     storage.value = setting.get_db_prep_save(value)
     storage.save()
-    key = _get_cache_key(module_name, class_name, attribute_name)
-    cache.delete(key)
+    if USE_CACHE:
+        key = _get_cache_key(module_name, class_name, attribute_name)
+        cache.delete(key)
