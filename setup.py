@@ -1,7 +1,7 @@
 from setuptools import setup
 
 # Dynamically calculate the version based on dbsettings.VERSION
-version_tuple = (0, 11, 'dive')
+version_tuple = (0, 11, 0)
 
 if version_tuple[2] is not None:
     if type(version_tuple[2]) == int:
