@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 
 import django
@@ -211,10 +213,10 @@ class SettingsTestCase(test.TestCase):
         self.assertEqual(Defaults.settings.datetime, datetime.datetime(2012, 3, 14, 12, 3, 14))
 
         # Settings should be retrieved in the order of definition
-        self.assertEqual(Populated.settings.keys(),
+        self.assertEqual(list(Populated.settings.keys()),
                          ['boolean', 'integer', 'string', 'list_semi_colon',
                           'list_comma', 'date', 'time', 'datetime'])
-        self.assertEqual(Combined.settings.keys(),
+        self.assertEqual(list(Combined.settings.keys()),
                          ['boolean', 'integer', 'string', 'list_semi_colon',
                           'list_comma', 'date', 'time', 'datetime', 'enabled'])
 

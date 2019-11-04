@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from setuptools import setup
 
 # Dynamically calculate the version based on dbsettings.VERSION
