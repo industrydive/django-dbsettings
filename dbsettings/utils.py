@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from __future__ import print_function
+
 def set_defaults(app, *defaults):
     "Installs a set of default values during syncdb processing"
     from django.core.exceptions import ImproperlyConfigured

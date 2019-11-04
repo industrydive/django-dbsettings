@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+
 import django
 from django.conf import settings
 from django.core.management import call_command
@@ -30,16 +32,15 @@ SETTINGS = {
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
     ),
-    'MIGRATION_MODULES': {
-        # This allow test models to be created even if they are not in migration.
-        # Still no better solution available: https://code.djangoproject.com/ticket/7835
-        # This hack is used in Django testrunner itself.
-        'dbsettings': 'dbsettings.skip_migrations_for_test',
-    },
     'TEMPLATES': [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
             'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.contrib.auth.context_processors.auth',
+                ],
+            },
         },
     ],
 }

@@ -1,4 +1,6 @@
 from __future__ import unicode_literals
+from __future__ import absolute_import
+
 from django.utils import six
 
 import datetime
@@ -265,7 +267,7 @@ class MultiSeparatorValue(TextValue):
         if value:
             value = six.text_type(value)
             value = value.split(self.separator)
-            value = filter(None, (x.strip() for x in value))
+            value = [_f for _f in (x.strip() for x in value) if _f]
         else:
             value = []
         return value
